@@ -1,14 +1,55 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<meta charset="utf-8">
-	<meta http-equiv="x-ua-compatible" content="ie=edge">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Title</title>
-	<script src="app.js"></script>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+      integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+      crossorigin="anonymous"
+    />
+    <title>Title</title>
 </head>
 <body>
-
-
+    <div class="form-section mt-5">
+      <div class="container">
+        <div class="row tasks-row">
+          <div class="col col-10 col-lg-6 mx-auto">
+            <div class="card">
+              <div class="card-body">
+                <h1 class="card-title h5">Add new task</h1>
+                <form name="addTask">
+                  <input
+                    type="text"
+                    name="title"
+                    id="title"
+                    class="form-control"
+                    placeholder="Task title"
+                  />
+                  <input
+                    type="text"
+                    name="body"
+                    id="body"
+                    class="form-control mt-3"
+                    placeholder="Task body"
+                  />
+                  <button type="submit" class="btn btn-primary mt-4">
+                    Add task
+                  </button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="tasks-list-section mt-5">
+      <div class="container">
+        <ul class="list-group"></ul>
+      </div>
+    </div>
+    <script src="app.js"></script>
 </body>
 </html>
