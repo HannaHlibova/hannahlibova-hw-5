@@ -57,7 +57,7 @@ const objOfTasks = tasks.reduce((acc, task) => {
 }, {});
 
 
-// UI Elements
+// UI General Elements
 const formHold = document.querySelector('.form-section');
 const tasksRow = document.querySelector('.tasks-row');
 const tasksList = document.querySelector('.tasks-list-section .list-group');
@@ -65,10 +65,14 @@ const form = document.forms['addTask'];
 const inputTitle = form.elements['title'];
 const inputBody = form.elements['body'];
 
+// msg elements
 const msgRow = document.createElement('div');
 const msgFrame = document.createElement('div');
 const msgCol = document.createElement('div');
 const msgHolder = document.createElement('div');
+
+// filter elements
+const filterBtnsHolder = document.createElement('div');
 
 // Functions
 const showMsg = () => {
@@ -110,6 +114,7 @@ const renderTasks = () => {
     fragment.appendChild(li);
   });
   tasksList.appendChild(fragment);
+  createFilterBtns();
 }
 
 const listItemTemplate = (task) => {
@@ -180,6 +185,44 @@ const listItemTemplate = (task) => {
   return li;
 }
 
+const createFilterBtns = () => {
+  filterBtnsHolder.classList.add(
+    'filter-holder',
+    'd-flex',
+    'mb-3',
+    'card',
+  );
+  
+  const filterBody = document.createElement('div');
+  filterBody.classList.add(
+    'card-body',
+  );
+  
+  const showActiveTasks = document.createElement('button');
+  showActiveTasks.classList.add(
+    'btn',
+    'btn-light',
+    'btn-active-tasks',
+    'mr-3',
+  );
+  showActiveTasks.textContent = 'Show active tasks';
+  
+  const showAllTasks = document.createElement('button');
+  showAllTasks.classList.add(
+    'btn',
+    'btn-light',
+    'btn-all-tasks',
+    'mr-3',
+  );
+  showAllTasks.classList.toggle('btn-dark');
+  showAllTasks.textContent = 'Show all tasks';
+  
+  filterBtnsHolder.appendChild(filterBody);
+  filterBody.appendChild(showActiveTasks);
+  filterBody.appendChild(showAllTasks);
+  tasksList.insertAdjacentElement('beforebegin', filterBtnsHolder);
+}
+
 const onFormSubmitHandler = (e) => {
   e.preventDefault();
   const titleValue = inputTitle.value;
@@ -234,12 +277,41 @@ const onDoneHandler = (e) => {
   if (target.classList.contains('btn-done')) {
     const parent = target.closest('[data-task-id]');
     const id = parent.dataset.taskId;
-    let completed = objOfTasks[id].completed;
+    let completed = tasks.completed;
     completed = true;
+    
+    
+    console.log(tasks);
+    console.log(activeTasks);
     
     parent.classList.add('bg-info');
   }
 }
+
+const onShowActive = (e) => {
+  const { target } = e;
+  
+  if (target.classList.contains('btn-active-tasks')) {
+    console.log(1);
+    removeListContent();
+    filterTasks();
+  }
+}
+
+const onShowAll = (e) => {
+  const { target } = e;
+  
+  if (target.classList.contains('btn-all-tasks')) {
+    console.log(2);
+  }
+}
+
+const removeListContent = () => {
+  while (tasksList.firstChild) {
+      tasksList.firstChild.remove();
+  }
+}
+const filterTasks = (tasks) => tasks.filter( task => task.completed === true );
 
 
 (function(arrOfTasks) {
@@ -250,4 +322,6 @@ const onDoneHandler = (e) => {
   form.addEventListener('submit', onFormSubmitHandler);
   tasksList.addEventListener('click', onDoneHandler);
   tasksList.addEventListener('click', onDeleteHandler);
+  filterBtnsHolder.addEventListener('click', onShowActive);
+  filterBtnsHolder.addEventListener('click', onShowAll);
 })(tasks);
