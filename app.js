@@ -311,7 +311,10 @@ const removeListContent = () => {
       tasksList.firstChild.remove();
   }
 }
-const filterTasks = (tasks) => tasks.filter( task => task.completed === true );
+const filterTasks = () => {
+  const activeTasks = tasks.filter( task => task.completed === true );
+  return activeTasks;
+}
 
 
 (function(arrOfTasks) {
