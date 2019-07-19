@@ -42,6 +42,14 @@ const tasks = [
     title:
       'Set Deserunt laborum id consectetur pariatur veniam occaecat occaecat tempor voluptate pariatur nulla reprehenderit ipsum.',
   },
+  {
+    _id: '5d2ca9e2dc8a87095c4e74c5',
+    completed: false,
+    body:
+      'Lorem Aliquip cupidatat ex adipisicing veniam do tempor.\r\n',
+    title:
+      'Set Deserunt laborum id.',
+  },
 ];
 const objOfTasks = tasks.reduce((acc, task) => {
   acc[task._id] = task;
@@ -58,39 +66,42 @@ const inputTitle = form.elements['title'];
 const inputBody = form.elements['body'];
 
 const msgRow = document.createElement('div');
+const msgFrame = document.createElement('div');
+const msgCol = document.createElement('div');
+const msgHolder = document.createElement('div');
 
 // Functions
 const showMsg = () => {
-  if(!tasks.length) {
-    msgRow.classList.add(
-      'row',
-      'msg-row',
-      'mt-4',
-    );
-    
-    const msgCol = document.createElement('div');
-    msgCol.classList.add(
-      'col',
-      'col-10',
-      'col-lg-6',
-      'mx-auto',
-    );
-    
-    const msgHolder = document.createElement('div');
-    msgHolder.classList.add('card');
-    
-    const msgFrame = document.createElement('div');
-    msgFrame.classList.add('card-body');
-    msgFrame.textContent = 'You have no tasks for now.';
-    
-    msgRow.appendChild(msgCol);
-    msgCol.appendChild(msgHolder);
-    msgHolder.appendChild(msgFrame);
-    tasksRow.insertAdjacentElement('afterend', msgRow);
-  }
+  msgRow.classList.add(
+    'row',
+    'msg-row',
+    'mt-4',
+  );
+  
+  msgCol.classList.add(
+    'col',
+    'col-10',
+    'col-lg-6',
+    'mx-auto',
+  );
+  
+  msgHolder.classList.add('card');
+
+  msgFrame.classList.add('card-body');
+  msgFrame.textContent = 'You have no tasks for now.';
+  
+  msgRow.appendChild(msgCol);
+  msgCol.appendChild(msgHolder);
+  msgHolder.appendChild(msgFrame);
+  tasksRow.insertAdjacentElement('afterend', msgRow);
 }
 
-const removeMsg = () => msgRow.remove();
+const removeMsg = () => {
+  msgCol.remove();
+  msgHolder.remove();
+  msgRow.remove();
+};
+
 
 const renderTasks = () => {
   const fragment = document.createDocumentFragment();
@@ -107,24 +118,64 @@ const listItemTemplate = (task) => {
     'list-group-item',
     'd-flex',
     'align-items-center',
-    'flex-wrap',
   );
   li.setAttribute('data-task-id', task._id);
-
-  const heading = document.createElement('strong');
-  heading.textContent = task.title;
   
-  const deleteBtn = document.createElement('button');
-  deleteBtn.textContent = 'Delete';
-  deleteBtn.classList.add('btn', 'btn-danger', 'ml-auto', 'delete-btn');
+  const descrWrap = document.createElement('div');
+  descrWrap.classList.add(
+    'description-wrap',
+    'd-flex',
+    'flex-grow-1',
+    'flex-column',
+    'flex-wrap',
+  );
+  
+  const btnsWrap = document.createElement('div');
+  btnsWrap.classList.add(
+    'btns-wrap',
+    'd-flex',
+    'flex-wrap',
+    'flex-grow-0',
+    'flex-shrink-0',
+    'pl-3',
+  );
+
+  const heading = document.createElement('h3');
+  heading.classList.add('h5');
+  heading.textContent = task.title;
 
   const taskDescription = document.createElement('p');
   taskDescription.textContent = task.body;
-  taskDescription.classList.add('mt-2', 'w-100');
+  taskDescription.classList.add('mt-2');
+  
+  const doneBtn = document.createElement('button');
+  doneBtn.textContent = 'Done';
+  doneBtn.classList.add(
+    'btn',
+    'btn-success',
+    'btn-done',
+    'mb-3',
+    'd-block',
+    'w-100',
+  );
+  
+  const deleteBtn = document.createElement('button');
+  deleteBtn.textContent = 'Delete';
+  deleteBtn.classList.add(
+    'btn',
+    'btn-danger',
+    'btn-delete',
+    'd-block',
+    'w-100',
+  );
 
-  li.appendChild(heading);
-  li.appendChild(taskDescription);
-  li.appendChild(deleteBtn);
+  li.appendChild(descrWrap);
+  descrWrap.appendChild(heading);
+  descrWrap.appendChild(taskDescription);
+  
+  li.appendChild(btnsWrap);
+  btnsWrap.appendChild(doneBtn);
+  btnsWrap.appendChild(deleteBtn);
 
   return li;
 }
@@ -165,23 +216,38 @@ const createNewTask = (title, body) => {
 const onDeleteHandler = (e) => {
   const { target } = e;
   
-  if (target.classList.contains('delete-btn')) {
+  if (target.classList.contains('btn-delete')) {
     const parentList = target.closest('.list-group');
     const parent = target.closest('[data-task-id]');
     const id = parent.dataset.taskId;
     parent.remove();
     delete objOfTasks[id];
-    
     if (!parentList.firstChild) {
       showMsg();
     }
   }
 }
 
+const onDoneHandler = (e) => {
+  const { target } = e;
+  
+  if (target.classList.contains('btn-done')) {
+    const parent = target.closest('[data-task-id]');
+    const id = parent.dataset.taskId;
+    let completed = objOfTasks[id].completed;
+    completed = true;
+    
+    parent.classList.add('bg-info');
+  }
+}
+
 
 (function(arrOfTasks) {
-  showMsg();
+  if(!tasks.length) {
+    showMsg();
+  }
   renderTasks();
   form.addEventListener('submit', onFormSubmitHandler);
+  tasksList.addEventListener('click', onDoneHandler);
   tasksList.addEventListener('click', onDeleteHandler);
 })(tasks);
