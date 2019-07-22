@@ -51,11 +51,17 @@ const tasks = [
       'Set Deserunt laborum id.',
   },
 ];
+
 const objOfTasks = tasks.reduce((acc, task) => {
   acc[task._id] = task;
   return acc;
 }, {});
 
+const objOfActiveTasks = Object.values(objOfTasks).filter(task => {
+  if(task.completed === false) {
+    return task;
+  }
+});
 
 // UI General Elements
 const formHold = document.querySelector('.form-section');
@@ -107,14 +113,16 @@ const removeMsg = () => {
 };
 
 
-const renderTasks = () => {
+const renderTasks = (obj) => {
   const fragment = document.createDocumentFragment();
-  Object.values(objOfTasks).forEach(task => {
+  Object.values(obj).forEach(task => {
     const li = listItemTemplate(task);
     fragment.appendChild(li);
   });
   tasksList.appendChild(fragment);
-  createFilterBtns();
+  if(!document.body.contains(filterBtnsHolder)) {
+    createFilterBtns();
+  }
 }
 
 const listItemTemplate = (task) => {
@@ -201,7 +209,7 @@ const createFilterBtns = () => {
   const showActiveTasks = document.createElement('button');
   showActiveTasks.classList.add(
     'btn',
-    'btn-light',
+    'btn-primary',
     'btn-active-tasks',
     'mr-3',
   );
@@ -210,16 +218,15 @@ const createFilterBtns = () => {
   const showAllTasks = document.createElement('button');
   showAllTasks.classList.add(
     'btn',
-    'btn-light',
+    'btn-primary',
     'btn-all-tasks',
     'mr-3',
   );
-  showAllTasks.classList.toggle('btn-dark');
   showAllTasks.textContent = 'Show all tasks';
   
   filterBtnsHolder.appendChild(filterBody);
-  filterBody.appendChild(showActiveTasks);
   filterBody.appendChild(showAllTasks);
+  filterBody.appendChild(showActiveTasks);
   tasksList.insertAdjacentElement('beforebegin', filterBtnsHolder);
 }
 
@@ -268,6 +275,7 @@ const onDeleteHandler = (e) => {
     if (!parentList.firstChild) {
       showMsg();
     }
+    
   }
 }
 
@@ -277,13 +285,8 @@ const onDoneHandler = (e) => {
   if (target.classList.contains('btn-done')) {
     const parent = target.closest('[data-task-id]');
     const id = parent.dataset.taskId;
-    let completed = tasks.completed;
+    let completed = objOfTasks[id];
     completed = true;
-    
-    
-    console.log(tasks);
-    console.log(activeTasks);
-    
     parent.classList.add('bg-info');
   }
 }
@@ -292,9 +295,9 @@ const onShowActive = (e) => {
   const { target } = e;
   
   if (target.classList.contains('btn-active-tasks')) {
-    console.log(1);
     removeListContent();
-    filterTasks();
+    renderTasks(objOfActiveTasks);
+    removeMsg();
   }
 }
 
@@ -302,7 +305,9 @@ const onShowAll = (e) => {
   const { target } = e;
   
   if (target.classList.contains('btn-all-tasks')) {
-    console.log(2);
+    removeListContent();
+    renderTasks(objOfTasks);
+    removeMsg();
   }
 }
 
@@ -311,17 +316,12 @@ const removeListContent = () => {
       tasksList.firstChild.remove();
   }
 }
-const filterTasks = () => {
-  const activeTasks = tasks.filter( task => task.completed === true );
-  return activeTasks;
-}
-
 
 (function(arrOfTasks) {
   if(!tasks.length) {
     showMsg();
   }
-  renderTasks();
+  renderTasks(objOfTasks);
   form.addEventListener('submit', onFormSubmitHandler);
   tasksList.addEventListener('click', onDoneHandler);
   tasksList.addEventListener('click', onDeleteHandler);
